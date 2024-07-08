@@ -8,6 +8,8 @@ public class Main {
         var db = new Database("example");
         var table = db.getTable("products");
 
-        System.out.println(table.getPath());
+        table.insert(1, "John Doe");
+        table.insert(2, "Jane Doe");
+        table.insert(3, "Joe Doe");
     }
 }
