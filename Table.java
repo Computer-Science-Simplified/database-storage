@@ -1,6 +1,8 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Table {
     private final String name;
@@ -48,5 +50,33 @@ public class Table {
 
         stream.write(bytes);
         stream.close();
+    }
+
+    public void selectById(int id) throws IOException {
+        /**
+         * - Read the first byte
+         * - Check if it's the given ID
+         * - If not, seek the appropriate number of bytes
+         * - Repeat
+         */
+
+        var stream = new FileInputStream(this.getPath().toString());
+
+        StringBuilder foundIdBuilder = new StringBuilder();
+        int b = stream.read();
+
+        while (b != 32) {
+            foundIdBuilder.append((char) b);
+
+            b = stream.read();
+        }
+
+        var foundId = Integer.parseInt(foundIdBuilder.toString());
+
+        if (foundId == id) {
+            System.out.println("found");
+        } else {
+            System.out.println("not yet");
+        }
     }
 }
