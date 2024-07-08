@@ -1,7 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 public class Table {
@@ -44,14 +42,11 @@ public class Table {
                 " " +
                 name;
 
-        System.out.println(content);
+        byte[] bytes = content.getBytes(StandardCharsets.US_ASCII);
 
-        var writer = new BufferedWriter(new FileWriter(this.getPath().toString(), true));
+        var stream = new FileOutputStream(this.getPath().toString(), true);
 
-        writer.write(content);
-        writer.newLine();
-        writer.close();
-
-        System.out.println("here");
+        stream.write(bytes);
+        stream.close();
     }
 }
