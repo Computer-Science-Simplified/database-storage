@@ -12,6 +12,6 @@ public class Main {
 //        table.insert(2, "Jane Doe");
 //        table.insert(3, "Joe Doe");
 
-        table.selectById(119);
+        table.selectById(2);
     }
 }

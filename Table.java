@@ -55,15 +55,30 @@ public class Table {
 
         raf.seek(0);
 
-        var foundId = this.readId(raf, id);
+        this.seekFile(raf, id);
 
-        System.out.println(foundId);
+        var row = this.readOneRow(raf);
+
+        System.out.println(row);
     }
 
-    private int readId(RandomAccessFile raf, int id) throws IOException {
+    private String readOneRow(RandomAccessFile raf) throws IOException {
         var data = this.readUntilNextSpace(raf);
-
         System.out.println(data);
+
+        var sb = new StringBuilder().append(data);
+
+        var sizeOfNextColumn = Character.getNumericValue((char) raf.readByte()) + 1;
+
+        for (int i = 0; i < sizeOfNextColumn; i++) {
+            sb.append((char) raf.readByte());
+        }
+
+        return sb.toString();
+    }
+
+    private long seekFile(RandomAccessFile raf, int id) throws IOException {
+        var data = this.readUntilNextSpace(raf);
 
         int foundId = -1;
 
@@ -73,13 +88,15 @@ public class Table {
         }
 
         if (foundId == id) {
-            return foundId;
+            raf.seek(raf.getFilePointer() - (1 + data.length()));
+
+            return raf.getFilePointer();
         } else {
             var sizeOfNextColumn = Character.getNumericValue((char) raf.readByte()) + 1;
 
             raf.skipBytes(sizeOfNextColumn);
 
-            return this.readId(raf, id);
+            return this.seekFile(raf, id);
         }
     }
 
