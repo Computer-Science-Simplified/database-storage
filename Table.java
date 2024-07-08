@@ -53,30 +53,40 @@ public class Table {
     }
 
     public void selectById(int id) throws IOException {
-        /**
-         * - Read the first byte
-         * - Check if it's the given ID
-         * - If not, seek the appropriate number of bytes
-         * - Repeat
-         */
+        var raf = new RandomAccessFile(this.getPath().toString(), "r");
 
-        var stream = new FileInputStream(this.getPath().toString());
+        raf.seek(0);
 
-        StringBuilder foundIdBuilder = new StringBuilder();
-        int b = stream.read();
+        var data = this.readUntilNextSpace(raf);
 
-        while (b != 32) {
-            foundIdBuilder.append((char) b);
-
-            b = stream.read();
-        }
-
-        var foundId = Integer.parseInt(foundIdBuilder.toString());
+        var foundId = Integer.parseInt(data);
 
         if (foundId == id) {
-            System.out.println("found");
+            System.out.printf("found %d %d", id, foundId);
         } else {
-            System.out.println("not yet");
+            raf.seek(data.length() + 1);
+
+            var numberOfCharsToSkip = Character.getNumericValue((char) raf.readByte()) + 1;
+
+            System.out.println(numberOfCharsToSkip);
+
+            raf.seek(data.length() + 1 + numberOfCharsToSkip + 1);
+
+            System.out.println((char) raf.readByte());
         }
+    }
+
+    private String readUntilNextSpace(RandomAccessFile raf) throws IOException {
+        StringBuilder data = new StringBuilder();
+
+        int b = raf.read();
+
+        while (b != 32) {
+            data.append((char) b);
+
+            b = raf.read();
+        }
+
+        return data.toString();
     }
 }
