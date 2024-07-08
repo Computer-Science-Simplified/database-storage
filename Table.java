@@ -1,8 +1,6 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Table {
     private final String name;
@@ -57,22 +55,31 @@ public class Table {
 
         raf.seek(0);
 
+        var foundId = this.readId(raf, id);
+
+        System.out.println(foundId);
+    }
+
+    private int readId(RandomAccessFile raf, int id) throws IOException {
         var data = this.readUntilNextSpace(raf);
 
-        var foundId = Integer.parseInt(data);
+        System.out.println(data);
+
+        int foundId = -1;
+
+        try {
+            foundId = Integer.parseInt(data);
+        } catch (NumberFormatException e) {
+        }
 
         if (foundId == id) {
-            System.out.printf("found %d %d", id, foundId);
+            return foundId;
         } else {
-            raf.seek(data.length() + 1);
+            var sizeOfNextColumn = Character.getNumericValue((char) raf.readByte()) + 1;
 
-            var numberOfCharsToSkip = Character.getNumericValue((char) raf.readByte()) + 1;
+            raf.skipBytes(sizeOfNextColumn);
 
-            System.out.println(numberOfCharsToSkip);
-
-            raf.seek(data.length() + 1 + numberOfCharsToSkip + 1);
-
-            System.out.println((char) raf.readByte());
+            return this.readId(raf, id);
         }
     }
 
