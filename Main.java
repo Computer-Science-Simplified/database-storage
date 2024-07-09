@@ -18,17 +18,17 @@ public class Main {
 //        table.insert(3, "Joe Doe");
 //        table.insert(27, "James Doe");
 
-        var result = table.selectById(1);
-
-        if (result.isPresent()) {
-            System.out.println(result.get());
-        } else {
-            System.out.println("Not found");
-        }
-
-//        int[] ids = new int[]{119,2,3};
-//        var results = table.selectByIds(ids);
+//        var result = table.selectById(10);
 //
-//        System.out.println(results);
+//        if (result.isPresent()) {
+//            System.out.println(result.get());
+//        } else {
+//            System.out.println("Not found");
+//        }
+
+        int[] ids = new int[]{119,231};
+        var results = table.selectByIds(ids);
+
+        System.out.println(results);
     }
 }

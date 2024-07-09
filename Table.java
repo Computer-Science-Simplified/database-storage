@@ -2,7 +2,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +41,7 @@ public class Table {
         var stream = new DataInputStream(new FileInputStream(this.getPath().toString()));
 
         int foundId = -1;
+
         int sizeOfNextColumn = 0;
 
         while (foundId != id) {
@@ -69,6 +69,22 @@ public class Table {
         return Optional.of(foundId + data);
     }
 
+    public List<Optional<String>> selectByIds(int[] ids) throws IOException {
+        List<Optional<String>> rows = new ArrayList<>();
+
+        for (int id : ids) {
+            var row = this.selectById(id);
+
+            if (row.isEmpty()) {
+                continue;
+            }
+
+            rows.add(row);
+        }
+
+        return rows;
+    }
+
     public void insert(int id, String name) throws IOException {
         var stream = new DataOutputStream(new FileOutputStream(this.getPath().toString(), true));
 
@@ -81,76 +97,5 @@ public class Table {
         }
 
         stream.close();
-    }
-
-    public String selectById2(int id) throws IOException {
-        var raf = new RandomAccessFile(this.getPath().toString(), "r");
-
-        raf.seek(0);
-
-        this.seekFile(raf, id);
-
-        return this.readOneRow(raf);
-    }
-
-//    public List<String> selectByIds(int[] ids) throws IOException {
-//        List<String> results = new ArrayList<>();
-//
-//        for (int id : ids) {
-//            results.add(this.selectById(id));
-//        }
-//
-//        return results;
-//    }
-
-    private String readOneRow(RandomAccessFile raf) throws IOException {
-        var data = this.readUntilNextSpace(raf);
-
-        var sb = new StringBuilder().append(data);
-
-        var sizeOfNextColumn = Character.getNumericValue((char) raf.readByte()) + 1;
-
-        for (int i = 0; i < sizeOfNextColumn; i++) {
-            sb.append((char) raf.readByte());
-        }
-
-        return sb.toString();
-    }
-
-    private long seekFile(RandomAccessFile raf, int id) throws IOException {
-        var data = this.readUntilNextSpace(raf);
-
-        int foundId = -1;
-
-        try {
-            foundId = Integer.parseInt(data);
-        } catch (NumberFormatException _) {
-        }
-
-        if (foundId == id) {
-            raf.seek(raf.getFilePointer() - (1 + data.length()));
-
-            return raf.getFilePointer();
-        } else {
-            var sizeOfNextColumn = Character.getNumericValue((char) raf.readByte()) + 1;
-
-            raf.skipBytes(sizeOfNextColumn);
-
-            return this.seekFile(raf, id);
-        }
-    }
-
-    private String readUntilNextSpace(RandomAccessFile raf) throws IOException {
-        StringBuilder data = new StringBuilder();
-
-        int b = raf.read();
-
-        while (b != 32) {
-            data.append((char) b);
-
-            b = raf.read();
-        }
-
-        return data.toString();
     }
 }
