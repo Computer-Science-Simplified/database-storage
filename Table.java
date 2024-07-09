@@ -1,11 +1,12 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Table {
     private final String name;
     private final Database db;
-    private final File file;
 
     public Path getPath() {
         return this.db.getPath().resolve(this.name).toAbsolutePath();
@@ -18,8 +19,6 @@ public class Table {
     public Table(Database db, String name) {
         this.db = db;
         this.name = name;
-
-        this.file = db.getPath().resolve(this.name).toAbsolutePath().toFile();
     }
 
     public static Table create(Database db, String name) throws IOException {
@@ -50,21 +49,28 @@ public class Table {
         stream.close();
     }
 
-    public void selectById(int id) throws IOException {
+    public String selectById(int id) throws IOException {
         var raf = new RandomAccessFile(this.getPath().toString(), "r");
 
         raf.seek(0);
 
         this.seekFile(raf, id);
 
-        var row = this.readOneRow(raf);
+        return this.readOneRow(raf);
+    }
 
-        System.out.println(row);
+    public List<String> selectByIds(int[] ids) throws IOException {
+        List<String> results = new ArrayList<>();
+
+        for (int id : ids) {
+            results.add(this.selectById(id));
+        }
+
+        return results;
     }
 
     private String readOneRow(RandomAccessFile raf) throws IOException {
         var data = this.readUntilNextSpace(raf);
-        System.out.println(data);
 
         var sb = new StringBuilder().append(data);
 
@@ -84,7 +90,7 @@ public class Table {
 
         try {
             foundId = Integer.parseInt(data);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException _) {
         }
 
         if (foundId == id) {

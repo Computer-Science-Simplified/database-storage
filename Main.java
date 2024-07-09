@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -12,6 +14,11 @@ public class Main {
 //        table.insert(2, "Jane Doe");
 //        table.insert(3, "Joe Doe");
 
-        table.selectById(2);
+//        table.selectById(3);
+
+        int[] ids = new int[]{119,2,3};
+        var results = table.selectByIds(ids);
+
+        System.out.println(results);
     }
 }
