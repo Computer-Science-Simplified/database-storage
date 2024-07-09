@@ -12,13 +12,19 @@ public class Main {
 //        var table = db.createTable("users");
         var table = db.getTable("users");
 //
-        table.read();
+//        table.read();
 //        table.insert(1, "John Doe");
 //        table.insert(2, "Jane Doe");
 //        table.insert(3, "Joe Doe");
 //        table.insert(27, "James Doe");
 
-//        table.selectById(3);
+        var result = table.selectById(1);
+
+        if (result.isPresent()) {
+            System.out.println(result.get());
+        } else {
+            System.out.println("Not found");
+        }
 
 //        int[] ids = new int[]{119,2,3};
 //        var results = table.selectByIds(ids);

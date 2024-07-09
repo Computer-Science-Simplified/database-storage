@@ -2,7 +2,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class Table {
     private final String name;
@@ -36,20 +38,35 @@ public class Table {
         return new Table(db, name);
     }
 
-    public void read() throws IOException {
+    public Optional<String> selectById(int id) throws IOException {
         var stream = new DataInputStream(new FileInputStream(this.getPath().toString()));
 
-        int id = stream.readInt();
-        System.out.println(id);
+        int foundId = -1;
+        int sizeOfNextColumn = 0;
 
-        int length = stream.readInt();
-        System.out.println(length);
+        while (foundId != id) {
+            try {
+                foundId = stream.readInt();
 
-        while (true) {
-            var b = stream.readByte();
+                sizeOfNextColumn = stream.readInt();
 
-            System.out.println(b);
+                if (foundId == id) {
+                    break;
+                }
+
+                stream.skipBytes(sizeOfNextColumn);
+            } catch (EOFException _) {
+                return Optional.empty();
+            }
         }
+
+        byte[] bytes = stream.readNBytes(sizeOfNextColumn);
+
+        String data = new String(bytes);
+
+        stream.close();
+
+        return Optional.of(foundId + data);
     }
 
     public void insert(int id, String name) throws IOException {
@@ -66,7 +83,7 @@ public class Table {
         stream.close();
     }
 
-    public String selectById(int id) throws IOException {
+    public String selectById2(int id) throws IOException {
         var raf = new RandomAccessFile(this.getPath().toString(), "r");
 
         raf.seek(0);
@@ -76,15 +93,15 @@ public class Table {
         return this.readOneRow(raf);
     }
 
-    public List<String> selectByIds(int[] ids) throws IOException {
-        List<String> results = new ArrayList<>();
-
-        for (int id : ids) {
-            results.add(this.selectById(id));
-        }
-
-        return results;
-    }
+//    public List<String> selectByIds(int[] ids) throws IOException {
+//        List<String> results = new ArrayList<>();
+//
+//        for (int id : ids) {
+//            results.add(this.selectById(id));
+//        }
+//
+//        return results;
+//    }
 
     private String readOneRow(RandomAccessFile raf) throws IOException {
         var data = this.readUntilNextSpace(raf);
