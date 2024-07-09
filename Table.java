@@ -6,10 +6,11 @@ import java.util.List;
 
 public class Table {
     private final String name;
+    private final String filename;
     private final Database db;
 
     public Path getPath() {
-        return this.db.getPath().resolve(this.name).toAbsolutePath();
+        return this.db.getPath().resolve(this.filename).toAbsolutePath();
     }
 
     public String getName() {
@@ -19,10 +20,11 @@ public class Table {
     public Table(Database db, String name) {
         this.db = db;
         this.name = name;
+        this.filename = name + ".bin";
     }
 
     public static Table create(Database db, String name) throws IOException {
-        File file = db.getPath().resolve(name).toAbsolutePath().toFile();
+        File file = db.getPath().resolve(name + ".bin").toAbsolutePath().toFile();
 
         if (file.createNewFile()) {
             System.out.printf("Table created [%s]", name);
@@ -34,18 +36,33 @@ public class Table {
         return new Table(db, name);
     }
 
+    public void read() throws IOException {
+        var stream = new DataInputStream(new FileInputStream(this.getPath().toString()));
+
+        int id = stream.readInt();
+        System.out.println(id);
+
+        int length = stream.readInt();
+        System.out.println(length);
+
+        while (true) {
+            var b = stream.readByte();
+
+            System.out.println(b);
+        }
+    }
+
     public void insert(int id, String name) throws IOException {
-        var content = id +
-                " " +
-                name.length() +
-                " " +
-                name;
+        var stream = new DataOutputStream(new FileOutputStream(this.getPath().toString(), true));
 
-        byte[] bytes = content.getBytes(StandardCharsets.US_ASCII);
+        stream.writeInt(id);
 
-        var stream = new FileOutputStream(this.getPath().toString(), true);
+        stream.writeInt(name.length());
 
-        stream.write(bytes);
+        for (byte b : name.getBytes(StandardCharsets.US_ASCII)) {
+            stream.writeByte(b);
+        }
+
         stream.close();
     }
 

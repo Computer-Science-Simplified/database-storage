@@ -1,3 +1,4 @@
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,19 +7,22 @@ public class Main {
     public static void main(String[] args) throws IOException {
 //        var db = Database.create("example");
 //        var table = db.createTable("products");
-
+//
         var db = new Database("example");
-        var table = db.getTable("products");
-
-//        table.insert(119, "John Doe");
+//        var table = db.createTable("users");
+        var table = db.getTable("users");
+//
+        table.read();
+//        table.insert(1, "John Doe");
 //        table.insert(2, "Jane Doe");
 //        table.insert(3, "Joe Doe");
+//        table.insert(27, "James Doe");
 
 //        table.selectById(3);
 
-        int[] ids = new int[]{119,2,3};
-        var results = table.selectByIds(ids);
-
-        System.out.println(results);
+//        int[] ids = new int[]{119,2,3};
+//        var results = table.selectByIds(ids);
+//
+//        System.out.println(results);
     }
 }

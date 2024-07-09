@@ -28,7 +28,10 @@ public class Database {
         var tablePaths = this.readTablePaths();
 
         for (Path tablePath : tablePaths) {
-            this.tables.add(new Table(this, tablePath.getFileName().toString()));
+            int idx = tablePath.getFileName().toString().indexOf(".");
+            String tableName = tablePath.getFileName().toString().substring(0, idx);
+
+            this.tables.add(new Table(this, tableName));
         }
     }
 
@@ -57,7 +60,7 @@ public class Database {
 
     public Table getTable(String tableName) {
         Optional<Table> table = this.tables.stream()
-                .filter(x -> x.getName().equals(tableName))
+                .filter(t -> t.getName().equals(tableName))
                 .findFirst();
 
         if (table.isEmpty()) {
