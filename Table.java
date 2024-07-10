@@ -48,7 +48,7 @@ public class Table {
             try {
                 foundId = stream.readInt();
 
-                sizeOfNextColumn = stream.readInt();
+                sizeOfNextColumn = stream.readByte();
 
                 if (foundId == id) {
                     break;
@@ -86,11 +86,16 @@ public class Table {
     }
 
     public void insert(int id, String name) throws IOException {
-        var stream = new DataOutputStream(new FileOutputStream(this.getPath().toString(), true));
+        var stream = new DataOutputStream(
+                new FileOutputStream(
+                        this.getPath().toString(),
+                        true
+                )
+        );
 
         stream.writeInt(id);
 
-        stream.writeInt(name.length());
+        stream.writeByte(name.length());
 
         for (byte b : name.getBytes(StandardCharsets.US_ASCII)) {
             stream.writeByte(b);
