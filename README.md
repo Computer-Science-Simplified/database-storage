@@ -1,0 +1,3 @@
+- `mkdir workdir`
+- `javac Main.java` 
+- `java Main`
